@@ -1,0 +1,14 @@
+services:
+  event-service:
+    container_name: event-service
+    build: .
+    restart: always
+    tty: true
+    stdin_open: true
+    volumes:
+      - event-service:/app
+    ports:
+      - "7005:8000"
+
+volumes:
+  event-service:
