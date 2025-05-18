@@ -6,9 +6,9 @@ services:
     tty: true
     stdin_open: true
     volumes:
-      - event-service:/app
+      - pay-service:/app
     ports:
       - "7005:8000"
 
 volumes:
-  event-service:
+  pay-service:
