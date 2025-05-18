@@ -1,6 +1,6 @@
 services:
-  event-service:
-    container_name: event-service
+  pay-service:
+    container_name: pay-service
     build: .
     restart: always
     tty: true
