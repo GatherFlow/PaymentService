@@ -1,0 +1,3 @@
+
+class PaymentMethod:
+    pass
