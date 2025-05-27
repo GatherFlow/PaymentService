@@ -9,6 +9,24 @@ services:
       - pay-service:/app
     ports:
       - "7005:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/paydb
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:15
+    container_name: pay-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: paydb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
 
 volumes:
   pay-service:
+  pgdata:

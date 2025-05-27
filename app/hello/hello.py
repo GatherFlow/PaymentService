@@ -2,7 +2,7 @@
 import fastapi
 
 
-hello_router = fastapi.APIRouter(prefix="/abc")
+hello_router = fastapi.APIRouter()
 
 
 @hello_router.get("")
