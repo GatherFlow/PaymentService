@@ -1,7 +1,10 @@
 
 import fastapi
 import uvicorn
-from .pay import pay_router
+
+from .endpoint import pay_router
+
+from config import APP_HOST, APP_PORT
 
 
 app = fastapi.FastAPI()
@@ -9,4 +12,4 @@ app.include_router(pay_router)
 
 
 def start_app():
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host=APP_HOST, port=APP_PORT)
