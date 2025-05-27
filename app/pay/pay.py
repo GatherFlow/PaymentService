@@ -2,9 +2,9 @@
 import fastapi
 
 
-hello_router = fastapi.APIRouter()
+pay_router = fastapi.APIRouter()
 
 
-@hello_router.get("/")
+@pay_router.get("/")
 async def send_message():
     return "<h1>Hello PayService</h1>"

@@ -1,11 +1,11 @@
 
 import fastapi
 import uvicorn
-from .hello import hello_router
+from .pay import pay_router
 
 
 app = fastapi.FastAPI()
-app.include_router(hello_router)
+app.include_router(pay_router)
 
 
 def start_app():
