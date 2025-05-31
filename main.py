@@ -2,7 +2,7 @@
 from app import start_app
 
 from utils.logger import setup_logger
-from config import LOGS_DIR, LOGS_LEVEL
+from app.config import LOGS_DIR, LOGS_LEVEL
 
 
 def main():
