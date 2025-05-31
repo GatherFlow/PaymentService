@@ -1,12 +1,13 @@
 
 from app import start_app
-
 from utils.logger import setup_logger
-from app.config import LOGS_DIR, LOGS_LEVEL
+from config import get_settings
 
 
 def main():
-    setup_logger(LOGS_DIR, LOGS_LEVEL)
+    settings = get_settings()
+
+    setup_logger(settings.logger.path, settings.logger.level)
     start_app()
 
 

@@ -21,9 +21,20 @@ class App(BaseModel):
     port: int = 8000
 
 
+class Logger(BaseModel):
+    path: str = "resources/logs"
+    level: str = "DEBUG"
+
+
+class Monopay(BaseModel):
+    token: str
+
+
 class Settings(BaseSettings):
     database: Database
     app: App
+    logger: Logger
+    monopay: Monopay
 
     @computed_field
     @property
