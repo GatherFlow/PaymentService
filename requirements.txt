@@ -6,3 +6,5 @@ aiomonobnk==0.5.5
 loguru==0.7.2
 alembic==1.16.1
 pydantic_settings==2.2.1
+psycopg2-binary==2.9.10
+asyncpg==0.30.0

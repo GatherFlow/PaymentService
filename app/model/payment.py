@@ -1,18 +1,21 @@
 
 import enum
-from sqlalchemy import Column, Integer, String, Enum
+from sqlalchemy import Enum
+from sqlalchemy.orm import Mapped, mapped_column
 
 from . import BaseModel
 
 
 class PaymentStatus(enum.Enum):
     pending = "pending"
-    declined = "declined"
-    accepted = "accepted"
+    active = "active"
+    expired = "expired"
+    cancelled = "cancelled"
 
 
 class Payment(BaseModel):
     __tablename__ = "Payment"
 
-    id = Column(Integer, primary_key=True, index=True)
-    status = Column(Enum(PaymentStatus), nullable=False, default=PaymentStatus.pending)
+    status: Mapped[PaymentStatus] = mapped_column(
+        Enum(PaymentStatus), nullable=False, default=PaymentStatus.pending
+    )

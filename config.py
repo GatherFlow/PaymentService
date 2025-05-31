@@ -1,17 +1,14 @@
 from functools import lru_cache
-from pathlib import Path
 
 from pydantic import BaseModel, SecretStr, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy.engine.url import URL
 
-PROJECT_DIR = Path(__file__).parent.parent.parent
-
 
 class Database(BaseModel):
     hostname: str = "127.0.0.1"
     username: str = "postgres"
-    password: SecretStr = "postgres"
+    password: SecretStr
     port: int = 5432
     db: str = "paydb"
 
@@ -49,7 +46,7 @@ class Settings(BaseSettings):
         )
 
     model_config = SettingsConfigDict(
-        env_file=f"{PROJECT_DIR}/.env",
+        env_file=f".env",
         case_sensitive=False,
         env_nested_delimiter="__",
     )
