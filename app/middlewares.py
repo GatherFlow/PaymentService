@@ -35,6 +35,11 @@ class CheckAuthMiddleware(BaseHTTPMiddleware):
             return None
 
     async def dispatch(self, request: Request, call_next):
+        dest = str(request.url).split("/")[-1]
+        if dest in ["docs", "openapi.json"]:
+            response = await call_next(request)
+            return response
+
         user_id = await self.get_user_id(request.cookies)
 
         if not user_id:
