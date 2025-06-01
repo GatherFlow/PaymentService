@@ -163,21 +163,21 @@ async def create_payment(
     description="Get status of created payment"
 )
 async def get_payment(
-    data: GetPaymentRequest,
+    payment_id: int,
     response: fastapi.Response,
     request: fastapi.Request
 ) -> GetPaymentResponse:
 
     async with get_async_session() as session:
-        assign = await session.get(ProductAssign, data.payment_id)
+        assign = await session.get(ProductAssign, payment_id)
         if assign:
-            payment = await session.get(Payment, data.payment_id)
+            payment = await session.get(Payment, payment_id)
 
     response.status_code = 404
     if not assign:
         return GetPaymentResponse(
             status=GetPaymentStatus.no_payment_error,
-            description=f"Can't find payment with id={data.payment_id}"
+            description=f"Can't find payment with id={payment_id}"
         )
 
     response.status_code = 200
