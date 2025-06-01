@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 
 from .endpoint import pay_router
 from .updater import Updater
+from .middlewares import CheckAuthMiddleware
 
 from config import get_settings
 
@@ -26,6 +27,8 @@ app = fastapi.FastAPI(
     root_path="/pay",
     lifespan=lifespan
 )
+app.add_middleware(CheckAuthMiddleware)
+
 app.include_router(pay_router)
 
 

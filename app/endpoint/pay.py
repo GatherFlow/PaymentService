@@ -1,4 +1,5 @@
 
+import aiohttp
 from typing import Any
 
 import fastapi
@@ -82,6 +83,7 @@ GET_PAYMENT_RESPONSES: dict[int | str, dict[str, Any]] = {
 async def create_payment(
     data: CreatePaymentRequest,
     response: fastapi.Response,
+    request: fastapi.Request
 ) -> CreatePaymentResponse:
 
     response.status_code = 404
@@ -135,7 +137,7 @@ async def create_payment(
         await session.flush()
 
         assign = ProductAssign(
-            user_id=1,
+            user_id=request.state.user_id,
             payment_id=payment.id,
             target_id=data.target_id,
             target=data.target,
@@ -163,6 +165,7 @@ async def create_payment(
 async def get_payment(
     data: GetPaymentRequest,
     response: fastapi.Response,
+    request: fastapi.Request
 ) -> GetPaymentResponse:
 
     async with get_async_session() as session:
@@ -180,7 +183,7 @@ async def get_payment(
     response.status_code = 200
     return GetPaymentResponse(
         data=GetPaymentData(
-            user_id=assign.id,
+            user_id=request.state.user_id,
             payment_id=assign.id,
             gateway=payment.gateway,
             url=payment.url,

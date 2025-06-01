@@ -1,6 +1,6 @@
 
 from datetime import datetime
-from sqlalchemy import Integer, ForeignKey, Enum, DateTime
+from sqlalchemy import Integer, ForeignKey, Enum, DateTime, String
 from sqlalchemy.orm import mapped_column, Mapped
 
 from app.enum import ProductType, AssignStatus
@@ -10,8 +10,8 @@ from . import BaseModel
 class ProductAssign(BaseModel):
     __tablename__ = 'ProductAssign'
 
-    user_id: Mapped[int] = mapped_column(
-        Integer, nullable=False
+    user_id: Mapped[str] = mapped_column(
+        String(200), nullable=False
     )
     payment_id: Mapped[int] = mapped_column(
         Integer, ForeignKey('Payment.id'), nullable=False

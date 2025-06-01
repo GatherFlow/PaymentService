@@ -11,7 +11,7 @@ class CreatePaymentData(BaseModel):
 
 
 class GetPaymentData(BaseModel):
-    user_id: int
+    user_id: str
     payment_id: int
     gateway: Gateway
     url: str
