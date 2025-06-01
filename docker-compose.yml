@@ -9,10 +9,6 @@ services:
       - pay-service:/app
     ports:
       - "7005:8000"
-    environment:
-      - db_uri=postgresql://postgres:postgres@postgres:5432/paydb
-      - app_host=0.0.0.0
-      - app_port=8000
     depends_on:
       - pay-postgres
 
