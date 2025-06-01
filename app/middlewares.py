@@ -31,7 +31,7 @@ class CheckAuthMiddleware(BaseHTTPMiddleware):
         if not user_id:
             return JSONResponse(
                 status_code=401,
-                content={"detail": f"Иди нахуй"}
+                content={"detail": f"You are not allowed to access this endpoint"}
             )
 
         request.state.user_id = user_id
