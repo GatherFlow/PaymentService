@@ -1,5 +1,6 @@
 
 import aiohttp
+from loguru import logger
 
 from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -10,8 +11,9 @@ from config import get_settings
 
 class CheckAuthMiddleware(BaseHTTPMiddleware):
     def __init__(self, app):
-        super().__init__(app)
+        BaseHTTPMiddleware.__init__(self, app)
 
+        self.log = logger.bind(classname=self.__class__.__name__)
         self.user_service_endpoint = get_settings().services.user
 
     async def get_user_id(self, cookies: dict) -> str | None:
@@ -22,6 +24,7 @@ class CheckAuthMiddleware(BaseHTTPMiddleware):
                     cookies=cookies,
                     raise_for_status=True
                 ) as response:
+                    self.log.debug(f"{response}")
 
                     data = await response.json()
                     return data["id"]
