@@ -4,6 +4,6 @@ import enum
 
 class AssignStatus(enum.Enum):
     pending = "pending"
-    active = "active"
+    success = "success"
     expired = "expired"
     cancelled = "cancelled"

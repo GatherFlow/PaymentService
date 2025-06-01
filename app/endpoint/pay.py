@@ -4,7 +4,6 @@ from typing import Any
 import fastapi
 from datetime import datetime, timedelta
 
-from aiomonobnk import MonoPay
 from aiomonobnk.types import InvoiceCreated
 
 from app.enum import CreatePaymentStatus, ProductType, Gateway, GetPaymentStatus
@@ -15,12 +14,12 @@ from app.schema.response import CreatePaymentResponse, GetPaymentResponse
 from app.schema.response import CreatePaymentData, GetPaymentData
 
 from app.database import get_async_session
+from app.mono import mono_client
 
 from config import get_settings
 
 
 pay_router = fastapi.APIRouter()
-mono = MonoPay(token=get_settings().monopay.token)
 
 
 async def get_event_ticket_id(ticket_id: int):
@@ -111,7 +110,7 @@ async def create_payment(
             )
 
     if data.gateway == Gateway.monobank:
-        invoice: InvoiceCreated = await mono.create_invoice(
+        invoice: InvoiceCreated = await mono_client.create_invoice(
             amount=round(price * 100),
             validity=get_settings().monopay.lifetime_seconds
         )
@@ -166,9 +165,9 @@ async def get_payment(
 ) -> GetPaymentResponse:
 
     async with get_async_session() as session:
-        assign = await session.get(ProductAssign, data.payment_id)
+        assign = await session.get_one(ProductAssign, data.payment_id)
         if assign:
-            payment = await session.get(Payment, data.payment_id)
+            payment = await session.get_one(Payment, data.payment_id)
 
     response.status_code = 404
     if not assign:

@@ -28,11 +28,17 @@ class Monopay(BaseModel):
     lifetime_seconds: int
 
 
+class Updater(BaseModel):
+    task_delay_seconds: int
+    check_payment_status_concurrency: int
+
+
 class Settings(BaseSettings):
     database: Database
     app: App
     logger: Logger
     monopay: Monopay
+    updater: Updater
 
     @computed_field
     @property

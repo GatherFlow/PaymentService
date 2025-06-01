@@ -1,13 +1,27 @@
 
+import asyncio
 import fastapi
 import uvicorn
+from contextlib import asynccontextmanager
 
 from .endpoint import pay_router
+from .updater import Updater
 
 from config import get_settings
 
 
-app = fastapi.FastAPI()
+@asynccontextmanager
+async def lifespan(app: fastapi.FastAPI):
+    updater = Updater()
+    task = asyncio.create_task(updater.start())
+
+    yield
+
+    # to avoid killing task
+    print(task)
+
+
+app = fastapi.FastAPI(lifespan=lifespan)
 app.include_router(pay_router)
 
 
