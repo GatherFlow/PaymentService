@@ -1,21 +1,21 @@
 
-import enum
-from sqlalchemy import Enum
-from sqlalchemy.orm import Mapped, mapped_column
+from datetime import datetime
+from sqlalchemy import Integer, ForeignKey, Enum, DateTime, String
+from sqlalchemy.orm import mapped_column, Mapped
 
+from app.enum import Gateway
 from . import BaseModel
 
 
-class PaymentStatus(enum.Enum):
-    pending = "pending"
-    active = "active"
-    expired = "expired"
-    cancelled = "cancelled"
-
-
 class Payment(BaseModel):
-    __tablename__ = "Payment"
+    __tablename__ = 'Payment'
 
-    status: Mapped[PaymentStatus] = mapped_column(
-        Enum(PaymentStatus), nullable=False, default=PaymentStatus.pending
+    gateway: Mapped[Gateway] = mapped_column(
+        Enum(Gateway), nullable=False
+    )
+    url: Mapped[str] = mapped_column(
+        String(255), nullable=True
+    )
+    external_id: Mapped[str] = mapped_column(
+        String(100), nullable=False
     )

@@ -1,10 +1,32 @@
 
 from pydantic import BaseModel
 
+from app.enum import CreatePaymentStatus, GetPaymentStatus
+from app.enum import AssignStatus, Gateway
+
+
+class CreatePaymentData(BaseModel):
+    payment_id: int
+    payment_url: str
+
+
+class GetPaymentData(BaseModel):
+    payment_id: int
+    gateway: Gateway
+    url: str
+    expires_at: int
+    status: AssignStatus
+
 
 class CreatePaymentResponse(BaseModel):
-    pass
+    status: CreatePaymentStatus = CreatePaymentStatus.ok
+    description: str = None
+
+    data: CreatePaymentData | None = None
 
 
 class GetPaymentResponse(BaseModel):
-    pass
+    status: GetPaymentStatus = GetPaymentStatus.ok
+    description: str = None
+
+    data: GetPaymentData | None = None

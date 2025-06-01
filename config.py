@@ -25,6 +25,7 @@ class Logger(BaseModel):
 
 class Monopay(BaseModel):
     token: str
+    lifetime_seconds: int
 
 
 class Settings(BaseSettings):

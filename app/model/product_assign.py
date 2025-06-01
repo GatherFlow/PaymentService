@@ -2,29 +2,14 @@
 from datetime import datetime
 from sqlalchemy import Integer, ForeignKey, Enum, DateTime
 from sqlalchemy.orm import mapped_column, Mapped
-import enum
 
+from app.enum import ProductType, AssignStatus
 from . import BaseModel
-
-
-class ProductType(enum.Enum):
-    sub = "Sub"
-    ticket = "Ticket"
-
-
-class AssignStatus(enum.Enum):
-    pending = "pending"
-    active = "active"
-    expired = "expired"
-    cancelled = "cancelled"
 
 
 class ProductAssign(BaseModel):
     __tablename__ = 'ProductAssign'
 
-    payment_method_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey('PaymentMethod.id'), nullable=False
-    )
     payment_id: Mapped[int] = mapped_column(
         Integer, ForeignKey('Payment.id'), nullable=False
     )
