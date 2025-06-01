@@ -24,7 +24,7 @@ async def lifespan(app: fastapi.FastAPI):
 
 app = fastapi.FastAPI(
     title="Swagger",
-    root_path="/pay",
+    root_path=get_settings().app.path,
     lifespan=lifespan
 )
 app.add_middleware(CheckAuthMiddleware)

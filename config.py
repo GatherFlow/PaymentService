@@ -16,6 +16,7 @@ class Database(BaseModel):
 class App(BaseModel):
     host: str = "0.0.0.0"
     port: int = 8000
+    path: str = ""
 
 
 class Logger(BaseModel):
@@ -33,12 +34,17 @@ class Updater(BaseModel):
     check_payment_status_concurrency: int
 
 
+class Services(BaseModel):
+    user: str
+
+
 class Settings(BaseSettings):
     database: Database
     app: App
     logger: Logger
     monopay: Monopay
     updater: Updater
+    services: Services
 
     @computed_field
     @property

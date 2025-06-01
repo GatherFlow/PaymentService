@@ -5,16 +5,20 @@ from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
 
+from config import get_settings
+
 
 class CheckAuthMiddleware(BaseHTTPMiddleware):
     def __init__(self, app):
         super().__init__(app)
 
+        self.user_service_endpoint = get_settings().services.user
+
     async def get_user_id(self, cookies: dict) -> str | None:
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(
-                    url="https://gather.onelil.tech/api/me",
+                    url=self.user_service_endpoint,
                     cookies=cookies,
                     raise_for_status=True
                 ) as response:
