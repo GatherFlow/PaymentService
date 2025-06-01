@@ -10,4 +10,4 @@ class CreatePaymentRequest(BaseModel):
 
 
 class GetPaymentRequest(BaseModel):
-    payment_id: int
+    id: int

@@ -168,8 +168,6 @@ async def get_payment(
     request: fastapi.Request
 ) -> GetPaymentResponse:
 
-    print(request.url)
-
     async with get_async_session() as session:
         assign = await session.get(ProductAssign, data.payment_id)
         if assign:
