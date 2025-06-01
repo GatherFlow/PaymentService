@@ -21,7 +21,11 @@ async def lifespan(app: fastapi.FastAPI):
     print(task)
 
 
-app = fastapi.FastAPI(lifespan=lifespan)
+app = fastapi.FastAPI(
+    title="Swagger",
+    root_path="/pay",
+    lifespan=lifespan
+)
 app.include_router(pay_router)
 
 
