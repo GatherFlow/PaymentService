@@ -15,12 +15,14 @@ class CheckAuthMiddleware(BaseHTTPMiddleware):
 
         self.log = logger.bind(classname=self.__class__.__name__)
         self.user_service_endpoint = get_settings().services.user
+        if self.user_service_endpoint.endswith("/"):
+            self.user_service_endpoint = self.user_service_endpoint[:-1]
 
     async def get_user_id(self, cookies: dict) -> str | None:
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(
-                    url=self.user_service_endpoint,
+                    url=f"{self.user_service_endpoint}/me",
                     cookies=cookies,
                     raise_for_status=True
                 ) as response:
