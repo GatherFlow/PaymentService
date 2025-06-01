@@ -165,9 +165,9 @@ async def get_payment(
 ) -> GetPaymentResponse:
 
     async with get_async_session() as session:
-        assign = await session.get_one(ProductAssign, data.payment_id)
+        assign = await session.get(ProductAssign, data.payment_id)
         if assign:
-            payment = await session.get_one(Payment, data.payment_id)
+            payment = await session.get(Payment, data.payment_id)
 
     response.status_code = 404
     if not assign:
