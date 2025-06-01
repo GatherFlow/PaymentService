@@ -27,7 +27,7 @@ app = fastapi.FastAPI(
     root_path=get_settings().app.path,
     lifespan=lifespan
 )
-#app.add_middleware(CheckAuthMiddleware)
+app.add_middleware(CheckAuthMiddleware)
 
 app.include_router(pay_router)
 
