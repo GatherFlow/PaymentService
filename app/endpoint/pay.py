@@ -135,6 +135,7 @@ async def create_payment(
         await session.flush()
 
         assign = ProductAssign(
+            user_id=1,
             payment_id=payment.id,
             target_id=data.target_id,
             target=data.target,
@@ -179,6 +180,7 @@ async def get_payment(
     response.status_code = 200
     return GetPaymentResponse(
         data=GetPaymentData(
+            user_id=assign.id,
             payment_id=assign.id,
             gateway=payment.gateway,
             url=payment.url,
