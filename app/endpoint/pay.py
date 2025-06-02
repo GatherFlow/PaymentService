@@ -105,7 +105,7 @@ async def create_payment(
 
     try:
         if data.target == ProductType.ticket:
-            price = await get_ticket_price(data.target_id)
+            price = await get_ticket_price(data.target_id, cookies=request.cookies)
             if not price:
                 return CreatePaymentResponse(
                     status=CreatePaymentStatus.no_event_ticket_error,
@@ -119,7 +119,7 @@ async def create_payment(
             )
 
         else:
-            price = await get_sub_price(sub_id=data.target_id)
+            price = await get_sub_price(sub_id=data.target_id, cookies=request.cookies)
             if not price:
                 return CreatePaymentResponse(
                     status=CreatePaymentStatus.no_sub_error,
