@@ -1,5 +1,6 @@
 
 import asyncio
+import aiohttp
 from loguru import logger
 
 from aiomonobnk.types import InvoiceStatus
@@ -45,7 +46,13 @@ class Updater:
             return
 
         elif new_status in [AssignStatus.expired, AssignStatus.cancelled]:
-            pass
+            async with aiohttp.ClientSession() as session:
+                async with session.delete(
+                    url=f"{get_settings().services.event}/ticket/delete",
+                    params={"id": assign.target_id},
+                    cookies={"api_key": get_settings().services.user_key}
+                ) as response:
+                    self.log.info(f"{response} -> {await response.text()}")
 
         await session.execute(
             update(ProductAssign)
