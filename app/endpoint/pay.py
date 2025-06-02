@@ -11,7 +11,7 @@ from aiomonobnk.types import InvoiceCreated
 from app.enum import CreatePaymentStatus, ProductType, Gateway, GetPaymentStatus
 from app.model import ProductAssign, Payment
 
-from app.schema.request import CreatePaymentRequest, GetPaymentRequest
+from app.schema.request import CreatePaymentRequest
 from app.schema.response import CreatePaymentResponse, GetPaymentResponse
 from app.schema.response import CreatePaymentData, GetPaymentData
 
@@ -24,19 +24,17 @@ from config import get_settings
 pay_router = fastapi.APIRouter()
 
 
-async def get_event_ticket_id(ticket_id: int, cookies: dict):
+async def create_ticket(event_ticket_id: int, user_id: str, cookies: dict):
     async with aiohttp.ClientSession() as session:
-        async with session.get(
+        async with session.post(
             url=f"{get_settings()}/ticket",
-            params={"id": ticket_id},
-            cookies=cookies,
-            raise_for_status=False
+            json={
+                event_ticket_id: event_ticket_id,
+                user_id: user_id
+            },
+            cookies=cookies
         ) as response:
             logger.debug(f"{response} -> {await response.text()}")
-
-            data = await response.json()
-
-    return data.get("event_ticket_id")
 
 
 async def get_ticket_price(event_ticket_id: int, cookies: dict):
@@ -105,64 +103,72 @@ async def create_payment(
 
     response.status_code = 404
 
-    if data.target == ProductType.ticket:
-        event_ticket_id = await get_event_ticket_id(data.target_id)
-        if not event_ticket_id:
-            return CreatePaymentResponse(
-                status=CreatePaymentStatus.no_ticket_error,
-                description=f"Can't find ticket with id={data.target_id}"
+    try:
+        if data.target == ProductType.ticket:
+            price = await get_ticket_price(data.target_id)
+            if not price:
+                return CreatePaymentResponse(
+                    status=CreatePaymentStatus.no_event_ticket_error,
+                    description=f"Can't find price of event_ticket with id={data.target_id}"
+                )
+
+            await create_ticket(
+                event_ticket_id=data.target_id,
+                user_id=request.state.user_id,
+                cookies=request.cookies
             )
 
-        price = await get_ticket_price(event_ticket_id)
-        if not price:
-            return CreatePaymentResponse(
-                status=CreatePaymentStatus.no_event_ticket_error,
-                description=f"Can't find price of event_ticket with id={event_ticket_id}"
+        else:
+            price = await get_sub_price(sub_id=data.target_id)
+            if not price:
+                return CreatePaymentResponse(
+                    status=CreatePaymentStatus.no_sub_error,
+                    description=f"Can't find price of sub with id={data.target_id}"
+                )
+
+        if data.gateway == Gateway.monobank:
+            invoice: InvoiceCreated = await mono_client.create_invoice(
+                amount=round(price * 100),
+                validity=get_settings().monopay.lifetime_seconds
             )
 
-    else:
-        price = await get_sub_price(sub_id=data.target_id)
-        if not price:
+            external_id = invoice.invoice_id
+            gateway_url = invoice.page_url
+
+        else:
             return CreatePaymentResponse(
-                status=CreatePaymentStatus.no_sub_error,
-                description=f"Can't find price of sub with id={data.target_id}"
+                status=CreatePaymentStatus.unknown_gateway_error,
+                description=f"Got unknown gateway={data.gateway}"
             )
 
-    if data.gateway == Gateway.monobank:
-        invoice: InvoiceCreated = await mono_client.create_invoice(
-            amount=round(price * 100),
-            validity=get_settings().monopay.lifetime_seconds
-        )
+        async with get_async_session() as session:
+            payment = Payment(
+                external_id=external_id,
+                gateway=data.gateway,
+                url=gateway_url
+            )
 
-        external_id = invoice.invoice_id
-        gateway_url = invoice.page_url
+            session.add(payment)
+            await session.flush()
 
-    else:
+            assign = ProductAssign(
+                user_id=request.state.user_id,
+                payment_id=payment.id,
+                target_id=data.target_id,
+                target=data.target,
+                expires_at=datetime.now() + timedelta(seconds=get_settings().monopay.lifetime_seconds)
+            )
+
+            session.add(assign)
+            await session.commit()
+
+    except Exception as err:
+        logger.exception(err)
+
         return CreatePaymentResponse(
-            status=CreatePaymentStatus.unknown_gateway_error,
-            description=f"Got unknown gateway={data.gateway}"
+            status=CreatePaymentStatus.unexpected_error,
+            description=str(err)
         )
-
-    async with get_async_session() as session:
-        payment = Payment(
-            external_id=external_id,
-            gateway=data.gateway,
-            url=gateway_url
-        )
-
-        session.add(payment)
-        await session.flush()
-
-        assign = ProductAssign(
-            user_id=request.state.user_id,
-            payment_id=payment.id,
-            target_id=data.target_id,
-            target=data.target,
-            expires_at=datetime.now() + timedelta(seconds=get_settings().monopay.lifetime_seconds)
-        )
-
-        session.add(assign)
-        await session.commit()
 
     response.status_code = 200
     return CreatePaymentResponse(
