@@ -42,10 +42,10 @@ async def get_event_ticket_id(ticket_id: int, cookies: dict):
 async def get_ticket_price(event_ticket_id: int, cookies: dict):
     async with aiohttp.ClientSession() as session:
         async with session.get(
-                url=f"{get_settings()}/event_ticket",
-                params={"id": event_ticket_id},
-                cookies=cookies,
-                raise_for_status=False
+            url=f"{get_settings()}/event_ticket",
+            params={"id": event_ticket_id},
+            cookies=cookies,
+            raise_for_status=False
         ) as response:
             logger.debug(f"{response} -> {await response.text()}")
 
