@@ -1,6 +1,7 @@
 
 import aiohttp
 from typing import Any
+from loguru import logger
 
 import fastapi
 from datetime import datetime, timedelta
@@ -23,21 +24,37 @@ from config import get_settings
 pay_router = fastapi.APIRouter()
 
 
-async def get_event_ticket_id(ticket_id: int):
-    if ticket_id == 1:
-        return 1
+async def get_event_ticket_id(ticket_id: int, cookies: dict):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(
+            url=f"{get_settings()}/ticket",
+            params={"id": ticket_id},
+            cookies=cookies,
+            raise_for_status=False
+        ) as response:
+            logger.debug(f"{response} -> {await response.text()}")
 
-    return None
+            data = await response.json()
+
+    return data.get("event_ticket_id")
 
 
-async def get_ticket_price(event_ticket_id: int):
-    if event_ticket_id == 1:
-        return 10
+async def get_ticket_price(event_ticket_id: int, cookies: dict):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(
+                url=f"{get_settings()}/event_ticket",
+                params={"id": event_ticket_id},
+                cookies=cookies,
+                raise_for_status=False
+        ) as response:
+            logger.debug(f"{response} -> {await response.text()}")
 
-    return None
+            data = await response.json()
+
+    return data.get("price")
 
 
-async def get_sub_price(sub_id: int):
+async def get_sub_price(sub_id: int, cookies: dict):
     if sub_id == 1:
         return 20
 

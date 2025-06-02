@@ -36,6 +36,7 @@ class Updater(BaseModel):
 
 class Services(BaseModel):
     user: str
+    event: str
 
 
 class Settings(BaseSettings):
