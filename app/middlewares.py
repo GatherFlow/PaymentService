@@ -1,3 +1,4 @@
+from http.client import responses
 
 import aiohttp
 from loguru import logger
@@ -26,7 +27,7 @@ class CheckAuthMiddleware(BaseHTTPMiddleware):
                     cookies=cookies,
                     raise_for_status=True
                 ) as response:
-                    self.log.debug(f"{response}")
+                    self.log.debug(f"{response} -> {await response.text()}")
 
                     data = await response.json()
                     return data["id"]
@@ -40,13 +41,18 @@ class CheckAuthMiddleware(BaseHTTPMiddleware):
             response = await call_next(request)
             return response
 
-        user_id = await self.get_user_id(request.cookies)
+        key = request.cookies.get("api_key")
+        if key == get_settings().app.key:
+            user_id = request.cookies.get("user_id")
 
-        if not user_id:
-            return JSONResponse(
-                status_code=401,
-                content={"detail": f"You are not allowed to access this endpoint"}
-            )
+        else:
+            user_id = await self.get_user_id(request.cookies)
+
+            if not user_id:
+                return JSONResponse(
+                    status_code=401,
+                    content={"detail": f"You are not allowed to access this endpoint"}
+                )
 
         request.state.user_id = user_id
 

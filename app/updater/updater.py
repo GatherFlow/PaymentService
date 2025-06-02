@@ -44,6 +44,9 @@ class Updater:
             self.log.warning(f"Unknown status -> {invoice.status}")
             return
 
+        elif new_status in [AssignStatus.expired, AssignStatus.cancelled]:
+            pass
+
         await session.execute(
             update(ProductAssign)
             .where(ProductAssign.id == assign.id)

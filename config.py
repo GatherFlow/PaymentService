@@ -17,6 +17,7 @@ class App(BaseModel):
     host: str = "0.0.0.0"
     port: int = 8000
     path: str = ""
+    key: str = "????"
 
 
 class Logger(BaseModel):
@@ -36,7 +37,9 @@ class Updater(BaseModel):
 
 class Services(BaseModel):
     user: str
+    user_key: str
     event: str
+    event_key: str
 
 
 class Settings(BaseSettings):
